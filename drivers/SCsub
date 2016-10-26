@@ -13,10 +13,15 @@ SConscript('windows/SCsub')
 
 # Sounds drivers
 SConscript('alsa/SCsub')
-SConscript('pulseaudio/SCsub')
 if (env["platform"] == "windows"):
     SConscript("rtaudio/SCsub")
     SConscript("wasapi/SCsub")
+SConscript('unix/SCsub');
+SConscript('pulseaudio/SCsub');
+SConscript('windows/SCsub');
+SConscript('gles2/SCsub');
+SConscript('pnm/SCsub');
+SConscript('3ds/SCsub');
 
 # Graphics drivers
 SConscript('gles2/SCsub')
