@@ -96,6 +96,8 @@ friend class Main;
 	virtual void finalize();
 	virtual void finalize_core();
 
+	
+
 // 	virtual void set_cmdline(const char* p_execpath, const List<String>& p_args);
 
 public:
@@ -151,7 +153,7 @@ public:
 
 // 	virtual String get_installed_templates_path() const { return ""; }
 	virtual String get_executable_path() const {return "test"; }
-	virtual Error execute(const String& p_path, const List<String>& p_arguments,bool p_blocking,ProcessID *r_child_id=NULL,String* r_pipe=NULL,int *r_exitcode=NULL) { return FAILED; }
+	virtual Error execute(const String &p_path, const List<String> &p_arguments, bool p_blocking, ProcessID *r_child_id = NULL, String *r_pipe = NULL, int *r_exitcode = NULL, bool read_stderr = false) { return FAILED; }
 	virtual Error kill(const ProcessID& p_pid) { return FAILED; }
 // 	virtual int get_process_ID() const;
 
@@ -202,7 +204,9 @@ public:
 // 	virtual void hide_virtual_keyboard();
 
 	virtual void set_cursor_shape(CursorShape p_shape) {}
-
+	virtual void set_custom_mouse_cursor(const RES &p_cursor, CursorShape p_shape, const Vector2 &p_hotspot){
+		
+	};
 	virtual bool get_swap_ok_cancel() { return false; }
 // 	virtual void dump_memory_to_file(const char* p_file);
 // 	virtual void dump_resources_to_file(const char* p_file);

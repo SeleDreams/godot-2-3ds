@@ -800,9 +800,11 @@ class RasterizerCitro3d : public Rasterizer {
 	VS::MaterialBlendMode canvas_blend_mode;
 	Matrix32 canvas_transform;
 	
-	float last_time;
-	float time_delta;
-	
+	float last_time = 0.0;
+	float time_delta = 0.0;
+	float time_scale = 0.0;
+	float scaled_time = 0.0;
+	int frame = 0;
 	
 	struct Vertex {
 		Vector3 position;
@@ -1130,6 +1132,7 @@ public:
 	virtual void begin_frame();
 
 	virtual void set_viewport(const VS::ViewportRect& p_viewport);
+	virtual void set_time_scale(float p_scale);
 	virtual void set_render_target(RID p_render_target,bool p_transparent_bg=false,bool p_vflip=false);
 	virtual void clear_viewport(const Color& p_color);
 	virtual void capture_viewport(Image* r_capture);

@@ -1985,8 +1985,14 @@ void RasterizerCitro3d::begin_frame()
 	
 	float time = (OS::get_singleton()->get_ticks_usec()/1000); // get msec
 	time/=1000.0; // make secs
-	time_delta=time-last_time;
+	if (frame != 0) {
+		time_delta = time_scale * (time - last_time);
+	} else {
+		time_delta = 0.0f;
+	}
+	scaled_time += time_delta;
 	last_time=time;
+	frame++;
 }
 
 void RasterizerCitro3d::capture_viewport(Image* r_capture) {
@@ -2018,6 +2024,10 @@ void RasterizerCitro3d::set_viewport(const VS::ViewportRect& p_viewport)
 	C3D_SetViewport(0, 0, p_viewport.height, p_viewport.width);
 }
 
+void RasterizerCitro3d::set_time_scale(float p_scale)
+{
+	time_scale = p_scale;
+}
 void RasterizerCitro3d::set_render_target(RID p_render_target, bool p_transparent_bg, bool p_vflip)
 {
 	print("set_render_target\n");
