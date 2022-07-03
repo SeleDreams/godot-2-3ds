@@ -1951,8 +1951,7 @@ RID RasterizerCitro3d::render_target_create()
 	
 	rt->target = C3D_RenderTargetCreate(480, 800, GPU_RB_RGBA8, GPU_RB_DEPTH24_STENCIL8);
 	C3D_RenderTargetSetOutput(rt->target, GFX_TOP, GFX_LEFT, DISPLAY_TRANSFER_FLAGS);
-	C3D_RenderTargetSetClear(rt->target, C3D_CLEAR_ALL, 0xFFFFFFFF, 0);
-	
+	C3D_RenderTargetClear(rt->target,C3D_CLEAR_ALL,0xFFFFFFFF,0);
 	rt->texture_ptr = texture;
 	rt->texture = texture_owner.make_rid( texture );
 	
@@ -2008,9 +2007,7 @@ void RasterizerCitro3d::clear_viewport(const Color& p_color)
 	c |= (u8)(p_color.b*255);
 	c <<= 8;
 	c |= (u8)(p_color.a*255);
-	
-	rt->target->renderBuf.clearColor = c;
-	C3D_RenderBufClear(&rt->target->renderBuf);
+	C3D_FrameBufClear(&rt->target->frameBuf,C3D_CLEAR_COLOR,c,NULL);
 };
 
 void RasterizerCitro3d::set_viewport(const VS::ViewportRect& p_viewport)
@@ -2031,7 +2028,8 @@ void RasterizerCitro3d::set_render_target(RID p_render_target, bool p_transparen
 		RenderTarget *rt = render_target_owner.get(p_render_target);
 		ERR_FAIL_COND(!rt);
 		ERR_FAIL_COND(!rt->target);
-		C3D_RenderBufBind(&rt->target->renderBuf);
+		C3D_SetFrameBuf(&rt->target->frameBuf);
+		//C3D_RenderBufBind(&rt->target->renderBuf);
 		current_rt=rt;
 		current_rt_transparent=p_transparent_bg;
 	}
@@ -2040,7 +2038,8 @@ void RasterizerCitro3d::set_render_target(RID p_render_target, bool p_transparen
 		print("null target\n");
 		current_rt = NULL;
 		current_rt_transparent = false;
-		C3D_RenderBufBind(&base_framebuffer->target->renderBuf);
+		C3D_SetFrameBuf(&base_framebuffer->target->frameBuf);
+		//C3D_RenderBufBind(&base_framebuffer->target->renderBuf);
 	}
 }
 
@@ -2052,14 +2051,15 @@ void RasterizerCitro3d::begin_scene(RID p_viewport_data,RID p_env,VS::ScenarioDe
 	alpha_render_list.clear();
 	
 	RenderTarget* rt = current_rt ? current_rt : base_framebuffer;
-	rt->target->renderBuf.clearColor = 0xFFFFFFFF;
+	auto clearColor = 0xFFFFFFFF;
 	
 	current_env = p_env.is_valid() ? environment_owner.get(p_env) : NULL;
 // 	current_vd=viewport_data_owner.get(p_viewport_data);
 	
 	C3D_TexEnv* env = C3D_GetTexEnv(0);
-	C3D_TexEnvSrc(env, C3D_Both, GPU_FRAGMENT_PRIMARY_COLOR, GPU_FRAGMENT_SECONDARY_COLOR, 0);
-	C3D_TexEnvOp(env, C3D_Both, 0, 0, 0);
+	C3D_TexEnvSrc(env, C3D_Both, GPU_FRAGMENT_PRIMARY_COLOR, GPU_FRAGMENT_SECONDARY_COLOR);
+	C3D_TexEnvOpRgb(env, GPU_TEVOP_RGB_0x0F, GPU_TEVOP_RGB_0x0F, GPU_TEVOP_RGB_0x0F);
+	C3D_TexEnvOpAlpha(env,GPU_TEVOP_A_SRC_ALPHA);
 	C3D_TexEnvFunc(env, C3D_Both, GPU_ADD);
 	
 	C3D_TexBind(0, NULL);
@@ -2168,8 +2168,8 @@ void RasterizerCitro3d::end_scene()
 	
 // 	alpha_render_list.sort_z();
 // 	_render_list_forward(&alpha_render_list, camera_transform, camera_transform_inverse,camera_projection,false,fragment_lighting,true);
-	
-	C3D_Flush();
+
+	//C3D_Flush();
 }
 void RasterizerCitro3d::end_shadow_map() {
 
@@ -2183,11 +2183,8 @@ void RasterizerCitro3d::end_frame()
 	print("end_frame %d %f\n", vertexArrays.size(), C3D_GetCmdBufUsage());
 	
 	RenderTarget* rt = current_rt ? current_rt : base_framebuffer;
-	
-	C3D_Flush();
-	C3D_RenderBufTransfer(&rt->target->renderBuf, (u32*)gfxGetFramebuffer(rt->target->screen, rt->target->side, NULL, NULL), rt->target->transferFlags);
-	
-	C3D_RenderBufClear(&rt->target->renderBuf);
+	C3D_FrameBufTransfer(&rt->target->frameBuf,rt->target->screen,rt->target->side,rt->target->transferFlags);
+	C3D_FrameBufClear(&rt->target->frameBuf,C3D_CLEAR_ALL,0xFFFFFFFF,0xFFFFFFFF);
 	
 	VertexArray **varray = vertexArrays.ptr();
 	for (int i = 0; i < vertexArrays.size(); ++i)
@@ -2199,7 +2196,6 @@ void RasterizerCitro3d::end_frame()
 
 void RasterizerCitro3d::flush_frame()
 {
-	C3D_Flush();
 }
 
 RID RasterizerCitro3d::canvas_light_occluder_create()
@@ -2346,7 +2342,7 @@ RID RasterizerCitro3d::canvas_light_shadow_buffer_create(int p_width)
 */
 	cls->renderTarget = C3D_RenderTargetCreate(480, 800, GPU_RB_RGBA8, GPU_RB_DEPTH24_STENCIL8);
 	C3D_RenderTargetSetOutput(cls->renderTarget, GFX_TOP, GFX_LEFT, DISPLAY_TRANSFER_FLAGS);
-	C3D_RenderTargetSetClear(cls->renderTarget, C3D_CLEAR_ALL, 0x0, 0);
+	C3D_RenderTargetClear(cls->renderTarget,C3D_CLEAR_ALL,0x0,0);
 	
 // 	ERR_FAIL_COND(!C3D_TexInit(&cls->texture, w, h, GPU_RGBA8));
 
@@ -2548,8 +2544,9 @@ void RasterizerCitro3d::canvas_draw_rect(const Rect2& p_rect, int p_flags, const
 		
 		C3D_TexBind(0, &texture->tex);
 		
-		C3D_TexEnvSrc(env, C3D_Both, GPU_TEXTURE0, GPU_PRIMARY_COLOR, 0);
-        C3D_TexEnvOp(env, C3D_Both, 0, 0, 0);
+		C3D_TexEnvSrc(env, C3D_Both, GPU_TEXTURE0, GPU_PRIMARY_COLOR);
+        C3D_TexEnvOpRgb(env, GPU_TEVOP_RGB_0x0F, GPU_TEVOP_RGB_0x0F, GPU_TEVOP_RGB_0x0F);
+		C3D_TexEnvOpAlpha(env,GPU_TEVOP_A_SRC_ALPHA);
         C3D_TexEnvFunc(env, C3D_Both, GPU_MODULATE);
 		
 		if (!(p_flags&CANVAS_RECT_REGION)) {
@@ -2567,8 +2564,9 @@ void RasterizerCitro3d::canvas_draw_rect(const Rect2& p_rect, int p_flags, const
 	{
 		C3D_TexBind(0, NULL);
 		
-		C3D_TexEnvSrc(env, C3D_Both, GPU_PRIMARY_COLOR, 0, 0);
-		C3D_TexEnvOp(env, C3D_Both, 0, 0, 0);
+		C3D_TexEnvSrc(env, C3D_Both, GPU_PRIMARY_COLOR);
+		C3D_TexEnvOpRgb(env, GPU_TEVOP_RGB_0x0F, GPU_TEVOP_RGB_0x0F, GPU_TEVOP_RGB_0x0F);
+		C3D_TexEnvOpAlpha(env,GPU_TEVOP_A_SRC_ALPHA);
 		C3D_TexEnvFunc(env, C3D_Both, GPU_REPLACE);
 		
 		_draw_quad(p_rect);
@@ -3937,15 +3935,17 @@ bool RasterizerCitro3d::_setup_material(const Geometry *p_geometry,const Materia
 		if (texture)
 		{
 			print("binding material texture\n");
-			C3D_TexEnvSrc(env, C3D_Both, GPU_PREVIOUS, GPU_TEXTURE0, 0);
-			C3D_TexEnvOp(env, C3D_Both, 0, 0, 0);
+			C3D_TexEnvSrc(env, C3D_Both, GPU_PREVIOUS, GPU_TEXTURE0);
+			C3D_TexEnvOpRgb(env, GPU_TEVOP_RGB_0x0F, GPU_TEVOP_RGB_0x0F, GPU_TEVOP_RGB_0x0F);
+	C3D_TexEnvOpAlpha(env,GPU_TEVOP_A_SRC_ALPHA);
 			C3D_TexEnvFunc(env, C3D_Both, GPU_MODULATE);
 		}
 		else
 		{
 			print("unbinding material texture\n");
-			C3D_TexEnvSrc(env, C3D_Both, GPU_PREVIOUS, 0, 0);
-			C3D_TexEnvOp(env, C3D_Both, 0, 0, 0);
+			C3D_TexEnvSrc(env, C3D_Both, GPU_PREVIOUS);
+			C3D_TexEnvOpRgb(env, GPU_TEVOP_RGB_0x0F, GPU_TEVOP_RGB_0x0F, GPU_TEVOP_RGB_0x0F);
+	C3D_TexEnvOpAlpha(env,GPU_TEVOP_A_SRC_ALPHA);
 			C3D_TexEnvFunc(env, C3D_Both, GPU_REPLACE);
 		}
 
@@ -4727,8 +4727,7 @@ void RasterizerCitro3d::init()
 
 	base_framebuffer->target = C3D_RenderTargetCreate(480, 800, GPU_RB_RGBA8, GPU_RB_DEPTH24_STENCIL8);
 	C3D_RenderTargetSetOutput(base_framebuffer->target, GFX_TOP, GFX_LEFT, DISPLAY_TRANSFER_FLAGS);
-	C3D_RenderTargetSetClear(base_framebuffer->target, C3D_CLEAR_ALL, 0x0, 0);
-	
+	C3D_RenderTargetClear(base_framebuffer->target, C3D_CLEAR_ALL, 0x0, 0);
 	base_framebuffer->texture_ptr = texture;
 	base_framebuffer->texture = texture_owner.make_rid( texture );
 	
@@ -4845,7 +4844,7 @@ void RasterizerCitro3d::restore_framebuffer()
 {
 	print("restore_framebuffer\n");
 	current_rt = NULL;
-	C3D_RenderBufBind(&base_framebuffer->target->renderBuf);
+	C3D_SetFrameBuf(&base_framebuffer->target->frameBuf);
 }
 
 RasterizerCitro3d::RasterizerCitro3d()

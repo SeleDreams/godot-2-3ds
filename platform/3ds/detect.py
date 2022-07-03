@@ -2,7 +2,7 @@
 import os
 import sys
 import platform
-
+import scons_compiledb
 
 def is_active():
 	return True
@@ -73,34 +73,33 @@ def build_shader_header(target, source, env):
 		f.write("static uint8_t shader_builtin_{}[] =\n{{{}}};".format(name, data_str))
 
 def configure(env):
-	
+	scons_compiledb.enable_with_cmdline(env)
 	env.disabled_modules = ['enet']
 
 	env.Append( BUILDERS = { 'PICA' : env.Builder(generator = build_shader_gen, suffix = '.shbin', src_suffix = '.pica') } )
 	env.Append( BUILDERS = { 'PICA_HEADER' : env.Builder(action = build_shader_header, suffix = '.h', src_suffix = '.shbin') } )
 	
 	env["bits"]="32"
-
+	devkitpro_path = os.environ["DEVKITPRO"]
+	devkitarm_path = os.environ["DEVKITARM"]
+	ctrulib_path = os.environ["CTRULIB"]
 	env.Append(CPPPATH=['#platform/3ds'])
-	env["CC"]="arm-none-eabi-gcc"
-	env["CXX"]="arm-none-eabi-g++"
-	env["LD"]="arm-none-eabi-g++"
-	env["AR"]="arm-none-eabi-ar"
-	env["RANLIB"]="arm-none-eabi-ranlib"
-	env["AS"]="arm-none-eabi-as"
+	env["CC"]= devkitarm_path + "/bin/arm-none-eabi-gcc"
+	env["CXX"]=devkitarm_path +"/bin/arm-none-eabi-g++"
+	env["LD"]=devkitarm_path +"/bin/arm-none-eabi-g++"
+	env["AR"]=devkitarm_path +"/bin/arm-none-eabi-ar"
+	env["RANLIB"]=devkitarm_path +"/bin/arm-none-eabi-ranlib"
+	env["AS"]=devkitarm_path +"/bin/arm-none-eabi-as"
 	
 	env.Append(CCFLAGS=['-march=armv6k', '-mtune=mpcore', '-mfloat-abi=hard', '-mtp=soft', '-mword-relocations'])
 	env.Append(CCFLAGS=['-fomit-frame-pointer'])
 	
-	devkitpro_path = os.environ["DEVKITPRO"]
-	ctrulib_path = os.environ["CTRULIB"]
 	
-	env.Append(CPPPATH=[devkitpro_path+"/portlibs/armv6k/include", devkitpro_path+"/portlibs/3ds/include"])
-	env.Append(LIBPATH=[devkitpro_path+"/portlibs/armv6k/lib", devkitpro_path+"/portlibs/3ds/lib"])
+	
+	env.Append(CPPPATH=[devkitpro_path+"/portlibs/armv6k/include", devkitpro_path+"/portlibs/3ds/include",ctrulib_path + "/include"])
+	env.Append(LIBPATH=[devkitpro_path+"/portlibs/armv6k/lib", devkitpro_path+"/portlibs/3ds/lib",ctrulib_path + "/lib"])
 	
 	env.Append(LINKFLAGS=['-specs=3dsx.specs', '-g', '-march=armv6k', '-mtune=mpcore', '-mfloat-abi=hard'])
-	env.Append(CPPPATH=[ctrulib_path+"/include"])
-	env.Append(LIBPATH=[ctrulib_path+"/lib"])
 	env.Append(LIBS=["citro3d","ctru"])
 	env.Append(LIBS=["png","z"])
 	
@@ -154,8 +153,6 @@ def configure(env):
 
 	if (env["freetype"]=="yes"):
 		env.ParseConfig('pkg-config freetype2 --cflags --libs')
-
-
 	#env.Append(CPPFLAGS=['-DOPENGL_ENABLED'])
 
 	#if (platform.system() == "Linux"):

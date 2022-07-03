@@ -11,6 +11,8 @@ import glob
 import sys
 import methods
 
+
+
 methods.update_version()
 
 # scan possible build platforms
