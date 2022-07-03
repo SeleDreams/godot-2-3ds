@@ -14,12 +14,11 @@ def get_name():
 
 
 def can_build():
-
-    if (not os.environ.has_key("DEVKITPRO")):
+    if (not "DEVKITPRO" in os.environ):
         return False
-    if (not os.environ.has_key("DEVKITARM")):
+    if (not "DEVKITARM" in os.environ):
         return False
-    if (not os.environ.has_key("CTRULIB")):
+    if (not "CTRULIB" in os.environ):
         return False
     if (os.name == "nt"):
         return False
@@ -72,7 +71,7 @@ def build_shader_gen(target, source, env, for_signature):
 def build_shader_header(target, source, env):
     import os
     data = source[0].get_contents()
-    data_str = ",".join([str(ord(x)) for x in data])
+    data_str = ",".join([str(x) for x in data])
     name = os.path.basename(str(target[0]))[:-2]
     target[0].prepare()
     with open(str(target[0]), 'w') as f:
@@ -101,7 +100,7 @@ def configure(env):
     env["AR"] = devkitarm_path + "/bin/arm-none-eabi-ar"
     env["RANLIB"] = devkitarm_path + "/bin/arm-none-eabi-ranlib"
     env["AS"] = devkitarm_path + "/bin/arm-none-eabi-as"
-    arch = ['-march=armv6k', '-mtune=mpcore','-mfloat-abi=hard', '-mtp=soft']
+    arch = ['-march=armv6k', '-mtune=mpcore','-mfloat-abi=hard','-marm', '-mfpu=vfp','-mtp=soft' ]
     env.Append(CCFLAGS=['-g','-Wall','-O2'] + ['-mword-relocations','-ffunction-sections', '-fno-rtti', '-fno-exceptions', '-std=gnu++11'] + arch )
 
     env.Append(CPPPATH=[devkitpro_path+"/portlibs/armv6k/include", devkitpro_path +
@@ -156,8 +155,8 @@ def configure(env):
         env.Append(CCFLAGS=['-g2', '-Wall',
                    '-DDEBUG_ENABLED', '-DDEBUG_MEMORY_ENABLED'])
 
-    env['PKG_CONFIG_PATH'] = "${DEVKITPRO}/portlibs/3ds/lib/pkgconfig"
     if (env['builtin_openssl'] == 'no'):
        env.ParseConfig('pkg-config openssl --cflags --libs')
     if (env["builtin_freetype"] == "no"):
+        env["PKG_CONFIG_PATH"] = "/opt/devkitpro/portlibs/3ds/lib/pkgconfig"
         env.ParseConfig('pkg-config freetype2 --cflags --libs')

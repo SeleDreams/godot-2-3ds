@@ -5,7 +5,7 @@ shaders = [
 	'3d',
 ]
 
-if env['BUILDERS'].has_key('PICA'):
+if 'PICA' in env['BUILDERS']:
 	for shader in shaders:
 		env.PICA(shader)
 		env.PICA_HEADER(shader)
