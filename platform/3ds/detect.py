@@ -100,9 +100,10 @@ def configure(env):
     env["AR"] = devkitarm_path + "/bin/arm-none-eabi-ar"
     env["RANLIB"] = devkitarm_path + "/bin/arm-none-eabi-ranlib"
     env["AS"] = devkitarm_path + "/bin/arm-none-eabi-as"
-    arch = ['-march=armv6k', '-mtune=mpcore','-mfloat-abi=hard','-marm', '-mfpu=vfp','-mtp=soft' ]
-    env.Append(CCFLAGS=['-g','-Wall','-O2'] + ['-mword-relocations','-ffunction-sections', '-fno-rtti', '-fno-exceptions', '-std=gnu++11'] + arch )
-
+	
+    arch = ['-march=armv6k', '-mtune=mpcore','-mfloat-abi=hard','-mtp=soft' ]
+    env.Append(CCFLAGS=['-g','-Wall','-mword-relocations','-ffunction-sections', '-fno-rtti', '-fno-exceptions', '-std=gnu++11'] + arch)
+    env.Append(CCFLAGS=['-D_3DS', '-DARM11','-DNEED_LONG_INT', '-DLIBC_FILEIO_ENABLED','-DNO_SAFE_CAST'])
     env.Append(CPPPATH=[devkitpro_path+"/portlibs/armv6k/include", devkitpro_path +
                "/portlibs/3ds/include", ctrulib_path + "/include", devkitarm_path + "/arm-none-eabi/include"])
     env.Append(LIBPATH=[devkitpro_path+"/portlibs/armv6k/lib", devkitpro_path +
@@ -112,35 +113,7 @@ def configure(env):
     env.Append(LIBS=["citro3d", "ctru","bz2"])
     env.Append(LIBS=["png", "z"])
 
-    # if (env["use_llvm"]=="yes"):
-    # if 'clang++' not in env['CXX']:
-    # env["CC"]="clang"
-    # env["CXX"]="clang++"
-    # env["LD"]="clang++"
-    # env.Append(CPPFLAGS=['-DTYPED_METHOD_BIND'])
-    # env.extra_suffix=".llvm"
-
-    # if (env["colored"]=="yes"):
-    # if sys.stdout.isatty():
-    # env.Append(CXXFLAGS=["-fcolor-diagnostics"])
-
-    # if (env["use_sanitizer"]=="yes"):
-    # env.Append(CXXFLAGS=['-fsanitize=address','-fno-omit-frame-pointer'])
-    # env.Append(LINKFLAGS=['-fsanitize=address'])
-    # env.extra_suffix+="s"
-
-    # if (env["use_leak_sanitizer"]=="yes"):
-    # env.Append(CXXFLAGS=['-fsanitize=address','-fno-omit-frame-pointer'])
-    # env.Append(LINKFLAGS=['-fsanitize=address'])
-    # env.extra_suffix+="s"
-
-    # if (env["tools"]=="no"):
-    #	#no tools suffix
-    #	env['OBJSUFFIX'] = ".nt"+env['OBJSUFFIX']
-    #	env['LIBSUFFIX'] = ".nt"+env['LIBSUFFIX']
-
-    env.Append(CCFLAGS=['-D_3DS', '-DARM11',
-               '-DNEED_LONG_INT', '-DLIBC_FILEIO_ENABLED','-DNO_SAFE_CAST','-DFT_CONFIG_OPTION_USE_BZIP2'])
+   
 
     if (env["target"] == "release"):
         if (env["debug_release"] == "yes"):
@@ -156,7 +129,6 @@ def configure(env):
                    '-DDEBUG_ENABLED', '-DDEBUG_MEMORY_ENABLED'])
 
     if (env['builtin_openssl'] == 'no'):
-       env.ParseConfig('pkg-config openssl --cflags --libs')
+       env.ParseConfig('PKG_CONFIG_PATH=${DEVKITPRO}/portlibs/3ds/lib/pkgconfig pkg-config openssl --cflags --libs')
     if (env["builtin_freetype"] == "no"):
-        env["PKG_CONFIG_PATH"] = "/opt/devkitpro/portlibs/3ds/lib/pkgconfig"
-        env.ParseConfig('pkg-config freetype2 --cflags --libs')
+        env.ParseConfig('PKG_CONFIG_PATH=${DEVKITPRO}/portlibs/3ds/lib/pkgconfig pkg-config freetype2 --cflags --libs')
