@@ -58,7 +58,7 @@ def get_flags():
         ('module_pvr_enabled', 'no'),
         ('module_etc1_enabled', 'no'),
         ('builtin_zlib', 'no'),
-		('builtin_freetype','yes'),
+        ('builtin_freetype','yes'),
         ("module_openssl_enabled", "no"),
         ('module_musepack_enabled', 'no')
     ]
@@ -100,14 +100,14 @@ def configure(env):
     env["AR"] = devkitarm_path + "/bin/arm-none-eabi-ar"
     env["RANLIB"] = devkitarm_path + "/bin/arm-none-eabi-ranlib"
     env["AS"] = devkitarm_path + "/bin/arm-none-eabi-as"
-	
+
     arch = ['-march=armv6k', '-mtune=mpcore','-mfloat-abi=hard','-mtp=soft' ]
     env.Append(CCFLAGS=['-g','-Wall','-mword-relocations','-ffunction-sections', '-fno-rtti', '-fno-exceptions', '-std=gnu++11'] + arch)
     env.Append(CCFLAGS=['-D_3DS', '-DARM11','-DNEED_LONG_INT', '-DLIBC_FILEIO_ENABLED','-DNO_SAFE_CAST'])
     env.Append(CPPPATH=[devkitpro_path+"/portlibs/armv6k/include", devkitpro_path +
                "/portlibs/3ds/include", ctrulib_path + "/include", devkitarm_path + "/arm-none-eabi/include"])
     env.Append(LIBPATH=[devkitpro_path+"/portlibs/armv6k/lib", devkitpro_path +
-               "/portlibs/3ds/lib", ctrulib_path + "/lib", devkitarm_path + "/arm-none-eabi/lib"])
+               "/portlibs/3ds/lib", ctrulib_path + "/lib", devkitarm_path + "/arm-none-eabi/lib/armv6k/fpu"])
 
     env.Append(LINKFLAGS=['-specs=3dsx.specs', '-g'] + arch)
     env.Append(LIBS=["citro3d", "ctru","bz2"])
