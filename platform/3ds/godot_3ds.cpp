@@ -26,31 +26,42 @@
 /* TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE     */
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                */
 /*************************************************************************/
+#define Mutex Lib3dsMutex
+#define Semaphore Lib3dsSemaphore
+#define Thread Lib3dsThread
+#define AudioDriver Lib3dsAudioDriver
+#include <3ds.h>
+#undef AudioDriver
+#undef Thread
+#undef Mutex
+#undef Semaphore
+
 #include "main/main.h"
 #include "os_3ds.h"
 #include <stdio.h>
 
-
-int main(int argc, char* argv[])
-{
+int main(int argc, char *argv[]) {
 	OS_3DS os;
+	romfsInit();
+	//char* args[] = {"--main-pack", "data.cpk"};
+	//char *args[] = { "" };
+	// 	char* args[] = {"-path", "motion", "-test", "render"};
+	// 	char* args[] = {"motion"};
 
-	char* args[] = {"-path", "sat_test"};
-// 	char* args[] = {"-path", "motion", "-test", "render"};
-// 	char* args[] = {"motion"};
-
-// 	Error err  = Main::setup(argv[0],argc-1,&argv[1]);
-	Error err  = Main::setup("3ds", 2, args);
-// 	Error err  = Main::setup("3ds", 0, NULL);
-	if (err==OK)
-	{
+	Error err  = Main::setup("3ds",0,NULL);
+	//Error err = Main::setup("romfs:/", 0, args);
+	// 	Error err  = Main::setup("3ds", 0, NULL);
+	if (err == OK) {
 		printf("Running...\n");
 
 		if (Main::start())
 			os.run(); // it is actually the OS that decides how to run
 		Main::cleanup();
 	}
-
+	else{
+		printf("%i",err);
+		while(true);
+	}
 	// OS_3DS destructor to exit ctrulib stuff
 	return 0;
 }

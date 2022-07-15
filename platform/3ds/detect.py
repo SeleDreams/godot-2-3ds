@@ -125,7 +125,7 @@ def configure(env):
         if (env["debug_release"] == "yes"):
             env.Append(CCFLAGS=['-g2'])
     elif (env["target"] == "debug"):
-        env.Append(CCFLAGS=['-g2', '-Wall',
+        env.Append(CCFLAGS=['-g2', '-O0','-Wall',
                    '-DDEBUG_ENABLED', '-DDEBUG_MEMORY_ENABLED'])
 
     if (env['builtin_openssl'] == 'no'):

@@ -130,7 +130,6 @@ void OS_3DS::initialize_core()
 	
 	mempool_static = new MemoryPoolStaticMalloc;
 	mempool_dynamic = memnew( MemoryPoolDynamicStatic );
-	
 	FileAccess::make_default<FileAccessUnix>(FileAccess::ACCESS_RESOURCES);
 	FileAccess::make_default<FileAccessUnix>(FileAccess::ACCESS_USERDATA);
 	FileAccess::make_default<FileAccessUnix>(FileAccess::ACCESS_FILESYSTEM);

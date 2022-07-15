@@ -2038,7 +2038,8 @@ void RasterizerCitro3d::set_render_target(RID p_render_target, bool p_transparen
 		RenderTarget *rt = render_target_owner.get(p_render_target);
 		ERR_FAIL_COND(!rt);
 		ERR_FAIL_COND(!rt->target);
-		C3D_SetFrameBuf(&rt->target->frameBuf);
+		//C3D_SetFrameBuf(&rt->target->frameBuf);
+		
 		//C3D_RenderBufBind(&rt->target->renderBuf);
 		current_rt=rt;
 		current_rt_transparent=p_transparent_bg;
@@ -2048,7 +2049,7 @@ void RasterizerCitro3d::set_render_target(RID p_render_target, bool p_transparen
 		print("null target\n");
 		current_rt = NULL;
 		current_rt_transparent = false;
-		C3D_SetFrameBuf(&base_framebuffer->target->frameBuf);
+		//C3D_SetFrameBuf(&base_framebuffer->target->frameBuf);
 		//C3D_RenderBufBind(&base_framebuffer->target->renderBuf);
 	}
 }
@@ -2068,7 +2069,7 @@ void RasterizerCitro3d::begin_scene(RID p_viewport_data,RID p_env,VS::ScenarioDe
 	
 	C3D_TexEnv* env = C3D_GetTexEnv(0);
 	C3D_TexEnvSrc(env, C3D_Both, GPU_FRAGMENT_PRIMARY_COLOR, GPU_FRAGMENT_SECONDARY_COLOR);
-	C3D_TexEnvOpRgb(env, GPU_TEVOP_RGB_0x0F, GPU_TEVOP_RGB_0x0F, GPU_TEVOP_RGB_0x0F);
+	C3D_TexEnvOpRgb(env, GPU_TEVOP_RGB_SRC_COLOR);
 	C3D_TexEnvOpAlpha(env,GPU_TEVOP_A_SRC_ALPHA);
 	C3D_TexEnvFunc(env, C3D_Both, GPU_ADD);
 	
@@ -2552,10 +2553,10 @@ void RasterizerCitro3d::canvas_draw_rect(const Rect2& p_rect, int p_flags, const
 			
 		}
 		
-		C3D_TexBind(0, &texture->tex);
+		//C3D_TexBind(0, &texture->tex);
 		
 		C3D_TexEnvSrc(env, C3D_Both, GPU_TEXTURE0, GPU_PRIMARY_COLOR);
-        C3D_TexEnvOpRgb(env, GPU_TEVOP_RGB_0x0F, GPU_TEVOP_RGB_0x0F, GPU_TEVOP_RGB_0x0F);
+        C3D_TexEnvOpRgb(env, GPU_TEVOP_RGB_SRC_COLOR);
 		C3D_TexEnvOpAlpha(env,GPU_TEVOP_A_SRC_ALPHA);
         C3D_TexEnvFunc(env, C3D_Both, GPU_MODULATE);
 		
@@ -2572,10 +2573,10 @@ void RasterizerCitro3d::canvas_draw_rect(const Rect2& p_rect, int p_flags, const
 	}
 	else
 	{
-		C3D_TexBind(0, NULL);
+		//C3D_TexBind(0, NULL);
 		
 		C3D_TexEnvSrc(env, C3D_Both, GPU_PRIMARY_COLOR);
-		C3D_TexEnvOpRgb(env, GPU_TEVOP_RGB_0x0F, GPU_TEVOP_RGB_0x0F, GPU_TEVOP_RGB_0x0F);
+		C3D_TexEnvOpRgb(env, GPU_TEVOP_RGB_SRC_COLOR);
 		C3D_TexEnvOpAlpha(env,GPU_TEVOP_A_SRC_ALPHA);
 		C3D_TexEnvFunc(env, C3D_Both, GPU_REPLACE);
 		
@@ -3946,16 +3947,16 @@ bool RasterizerCitro3d::_setup_material(const Geometry *p_geometry,const Materia
 		{
 			print("binding material texture\n");
 			C3D_TexEnvSrc(env, C3D_Both, GPU_PREVIOUS, GPU_TEXTURE0);
-			C3D_TexEnvOpRgb(env, GPU_TEVOP_RGB_0x0F, GPU_TEVOP_RGB_0x0F, GPU_TEVOP_RGB_0x0F);
-	C3D_TexEnvOpAlpha(env,GPU_TEVOP_A_SRC_ALPHA);
+			C3D_TexEnvOpRgb(env, GPU_TEVOP_RGB_SRC_COLOR);
+			C3D_TexEnvOpAlpha(env,GPU_TEVOP_A_SRC_ALPHA);
 			C3D_TexEnvFunc(env, C3D_Both, GPU_MODULATE);
 		}
 		else
 		{
 			print("unbinding material texture\n");
 			C3D_TexEnvSrc(env, C3D_Both, GPU_PREVIOUS);
-			C3D_TexEnvOpRgb(env, GPU_TEVOP_RGB_0x0F, GPU_TEVOP_RGB_0x0F, GPU_TEVOP_RGB_0x0F);
-	C3D_TexEnvOpAlpha(env,GPU_TEVOP_A_SRC_ALPHA);
+			C3D_TexEnvOpRgb(env, GPU_TEVOP_RGB_SRC_COLOR);
+			C3D_TexEnvOpAlpha(env,GPU_TEVOP_A_SRC_ALPHA);
 			C3D_TexEnvFunc(env, C3D_Both, GPU_REPLACE);
 		}
 

@@ -224,7 +224,10 @@ public:
 
 // 	String get_safe_application_name() const;
 // 	virtual String get_data_dir() const { return "."; }
-// 	virtual String get_resource_dir() const { printf("res dir: %s\n", Globals::get_singleton()->get_resource_path().utf8().get_data()); return Globals::get_singleton()->get_resource_path(); }
+	virtual String get_resource_dir() const { 
+		//printf("res dir: %s\n", Globals::get_singleton()->get_resource_path().utf8().get_data()); return Globals::get_singleton()->get_resource_path(); 
+			return "romfs:/";
+		}
 
 
 // 	virtual String get_system_dir(SystemDir p_dir) const;

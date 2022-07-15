@@ -27,8 +27,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                */
 /*************************************************************************/
 #include "export.h"
-#include "platform/3ds/logo.h"
-#include "tools/editor/editor_import_export.h"
+#include "platform/3ds/logo.gen.h"
+#include "editor/editor_import_export.h"
 #include "scene/resources/texture.h"
 
 void register_3ds_exporter() {
@@ -39,7 +39,7 @@ void register_3ds_exporter() {
 
 	{
 		Ref<EditorExportPlatformPC> exporter = Ref<EditorExportPlatformPC>( memnew(EditorExportPlatformPC) );
-		exporter->set_binary_extension(".elf");
+		exporter->set_binary_extension("elf");
 		exporter->set_release_binary32("3ds_release");
 		exporter->set_debug_binary32("3ds_debug");
 		exporter->set_name("Nintendo 3DS");
