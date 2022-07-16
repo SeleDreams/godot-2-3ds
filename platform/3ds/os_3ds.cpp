@@ -113,7 +113,7 @@ void OS_3DS::run()
 		if (Main::iteration()==true)
 			break;
 		
-		printf("fps:%f\n", get_frames_per_second());
+		//printf("fps:%f\n", get_frames_per_second());
 	}
 	
 	main_loop->finish();
