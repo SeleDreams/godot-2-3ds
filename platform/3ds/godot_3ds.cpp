@@ -43,25 +43,20 @@
 int main(int argc, char *argv[]) {
 	OS_3DS os;
 	romfsInit();
-	//char* args[] = {"--main-pack", "data.cpk"};
-	//char *args[] = { "" };
-	// 	char* args[] = {"-path", "motion", "-test", "render"};
-	// 	char* args[] = {"motion"};
+	// char* args[] = {"--main-pack", "data.cpk"};
+	// char *args[] = { "" };
+	//  	char* args[] = {"-path", "motion", "-test", "render"};
+	//  	char* args[] = {"motion"};
 
-	Error err  = Main::setup("3ds",0,NULL);
-	//Error err = Main::setup("romfs:/", 0, args);
-	// 	Error err  = Main::setup("3ds", 0, NULL);
-	if (err == OK) {
-		printf("Running...\n");
+	Error err = Main::setup("3ds", 0, NULL);
+	// Error err = Main::setup("romfs:/", 0, args);
+	//  	Error err  = Main::setup("3ds", 0, NULL);
+	printf("Running...\n");
 
-		if (Main::start())
-			os.run(); // it is actually the OS that decides how to run
-		Main::cleanup();
-	}
-	else{
-		printf("%i",err);
-		while(true);
-	}
+	if (Main::start())
+		os.run(); // it is actually the OS that decides how to run
+	Main::cleanup();
+
 	// OS_3DS destructor to exit ctrulib stuff
 	return 0;
 }

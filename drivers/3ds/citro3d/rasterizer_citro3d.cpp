@@ -2181,8 +2181,6 @@ void RasterizerCitro3d::end_scene()
 	
 // 	alpha_render_list.sort_z();
 // 	_render_list_forward(&alpha_render_list, camera_transform, camera_transform_inverse,camera_projection,false,fragment_lighting,true);
-
-	C3D_FrameSync();
 	
 }
 void RasterizerCitro3d::end_shadow_map() {
@@ -2191,17 +2189,13 @@ void RasterizerCitro3d::end_shadow_map() {
 
 
 void RasterizerCitro3d::end_frame()
-{ 	
-	C3D_FrameSync();
+{
 	C3D_FrameEnd(0);
 	
 	print("end_frame %d %f\n", vertexArrays.size(), C3D_GetCmdBufUsage());
 	
 	RenderTarget* rt = current_rt ? current_rt : base_framebuffer;
 	C3D_FrameBufTransfer(&rt->target->frameBuf,rt->target->screen,rt->target->side,rt->target->transferFlags);
-	C3D_RenderTargetSetOutput(rt->target,  GFX_TOP, GFX_LEFT,  DISPLAY_TRANSFER_FLAGS);
-	//C3D_FrameBufClear(&rt->target->frameBuf,C3D_CLEAR_ALL,CLEAR_COLOR,0);
-	C3D_RenderTargetClear(rt->target,C3D_CLEAR_ALL,C3D_CLEAR_COLOR,0);
 	VertexArray **varray = vertexArrays.ptr();
 	for (int i = 0; i < vertexArrays.size(); ++i)
 		memdelete(*varray++);
@@ -2212,7 +2206,6 @@ void RasterizerCitro3d::end_frame()
 
 void RasterizerCitro3d::flush_frame()
 {
-	C3D_FrameSync();
 }
 
 RID RasterizerCitro3d::canvas_light_occluder_create()
@@ -2579,7 +2572,7 @@ void RasterizerCitro3d::canvas_draw_rect(const Rect2& p_rect, int p_flags, const
 	}
 	else
 	{
-		//C3D_TexBind(0, NULL);
+		C3D_TexBind(0, NULL);
 		
 		C3D_TexEnvSrc(env, C3D_Both, GPU_PRIMARY_COLOR);
 		C3D_TexEnvOpRgb(env, GPU_TEVOP_RGB_SRC_COLOR);
@@ -4662,7 +4655,6 @@ void RasterizerCitro3d::_draw_quad(const Rect2& p_rect)
 	
 	vertexArrays.push_back(varray);
 // 	C3D_Flush();
-	C3D_FrameSync();
 // 	_draw_gui_primitive(4,coords,0,0);
 // 	_rinfo.ci_draw_commands++;
 }
@@ -4709,7 +4701,6 @@ void RasterizerCitro3d::_draw_textured_quad(const Rect2& p_rect, const Rect2& p_
 	C3D_DrawArrays(GPU_TRIANGLE_FAN, 0, 4);
 
 	vertexArrays.push_back(varray);
-	C3D_FrameSync();
 // 	_draw_gui_primitive(4,coords,0,texcoords);
 // 	_rinfo.ci_draw_commands++;
 }
