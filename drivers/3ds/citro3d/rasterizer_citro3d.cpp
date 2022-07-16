@@ -1993,7 +1993,7 @@ void RasterizerCitro3d::begin_frame()
 	scaled_time += time_delta;
 	last_time=time;
 	frame++;
-	C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+	C3D_FrameBegin(0);
 }
 
 void RasterizerCitro3d::capture_viewport(Image* r_capture) {
@@ -4851,8 +4851,6 @@ void RasterizerCitro3d::restore_framebuffer()
 {
 	print("restore_framebuffer\n");
 	current_rt = NULL;
-	//C3D_RenderTargetSetOutput(base_framebuffer->target,GFX_TOP,GFX_LEFT,DISPLAY_TRANSFER_FLAGS);
-	//C3D_RenderTargetClear(base_framebuffer->target,C3D_CLEAR_ALL,CLEAR_COLOR,0);
 	C3D_SetFrameBuf(&base_framebuffer->target->frameBuf);
 }
 

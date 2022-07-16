@@ -82,12 +82,12 @@ OS_3DS::OS_3DS()
 	consoleInit(GFX_BOTTOM, NULL);
 	
 	aptHook(&apt_hook_cookie, apt_hook_callback, this);
-	
+	osSetSpeedupEnable(true);
 // 	set_low_processor_usage_mode(true);
 	_render_thread_mode=RENDER_THREAD_UNSAFE;
 	AudioDriverManagerSW::add_driver(&audio_driver);
 	
-	use_vsync = true;
+	use_vsync = false;
 	last_id = 1;
 }
 
@@ -102,7 +102,6 @@ void OS_3DS::run()
 		return;
 	
 	main_loop->init();
-
 	while (aptMainLoop())
 	{
 		processInput();
@@ -113,7 +112,7 @@ void OS_3DS::run()
 		if (Main::iteration()==true)
 			break;
 		
-		//printf("fps:%f\n", get_frames_per_second());
+		printf("fps:%f\n", get_frames_per_second());
 	}
 	
 	main_loop->finish();
