@@ -2190,7 +2190,7 @@ void RasterizerCitro3d::end_shadow_map() {
 
 void RasterizerCitro3d::end_frame()
 {
-	C3D_FrameEnd(0);
+	C3D_FrameEnd(GX_CMDLIST_UPDATE_GAS_ACC);
 	
 	print("end_frame %d %f\n", vertexArrays.size(), C3D_GetCmdBufUsage());
 	
@@ -4719,7 +4719,7 @@ int RasterizerCitro3d::RenderList::max_elements;
 void RasterizerCitro3d::init()
 {	
 	print("citro init ");
-	C3D_Init(0x100000);
+	C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
 	draw_next_frame = false;
 
 	canvas_shader = memnew(Shader);

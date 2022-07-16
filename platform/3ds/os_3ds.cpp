@@ -79,15 +79,14 @@ OS_3DS::OS_3DS()
 : video_mode(800, 480, true, false, false)
 {	
 	gfxInitDefault();
-	consoleInit(GFX_BOTTOM, NULL);
-	
+	//consoleInit(GFX_BOTTOM, NULL);
+	gfxSetDoubleBuffering(GFX_TOP, true);
 	aptHook(&apt_hook_cookie, apt_hook_callback, this);
-	osSetSpeedupEnable(true);
+	osSetSpeedupEnable(false);
 // 	set_low_processor_usage_mode(true);
 	_render_thread_mode=RENDER_THREAD_UNSAFE;
 	AudioDriverManagerSW::add_driver(&audio_driver);
-	
-	use_vsync = false;
+	use_vsync = true;
 	last_id = 1;
 }
 
@@ -112,7 +111,7 @@ void OS_3DS::run()
 		if (Main::iteration()==true)
 			break;
 		
-		printf("fps:%f\n", get_frames_per_second());
+		//printf("fps:%f\n", get_frames_per_second());
 	}
 	
 	main_loop->finish();
@@ -356,7 +355,7 @@ uint64_t OS_3DS::get_system_time_secs() const
 
 void OS_3DS::swap_buffers()
 {
-// 	gfxFlushBuffers();
+ 	//gfxFlushBuffers();
 	gfxSwapBuffersGpu();
 	if (use_vsync)
 		gspWaitForVBlank();
