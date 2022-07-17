@@ -28,7 +28,7 @@
 /*************************************************************************/
 #ifdef _3DS
 #include "audio_driver_3ds.h"
-
+#include "thread_3ds.h"
 #include "globals.h"
 #include "os/os.h"
 #include <string.h>
@@ -37,7 +37,6 @@ static int channel_num = 1;
 
 
 Error AudioDriver3ds::init() {
-	
 	if (ndspInit() < 0)
 		return FAILED;
 
@@ -72,7 +71,7 @@ Error AudioDriver3ds::init() {
 	ndspChnSetFormat(channel_num, (channels == 1) ? NDSP_FORMAT_MONO_PCM16 : NDSP_FORMAT_STEREO_PCM16);
 
 	mutex = Mutex::create();
-	thread = Thread::create(AudioDriver3ds::thread_func, this);
+	thread = Thread3ds::create(AudioDriver3ds::thread_func, this);
 
 	return OK;
 };
@@ -153,7 +152,7 @@ void AudioDriver3ds::finish() {
 		return;
 
 	exit_thread = true;
-	Thread::wait_to_finish(thread);
+	Thread3ds::wait_to_finish(thread);
 
 	if (samples_in) {
 		memdelete_arr(samples_in);

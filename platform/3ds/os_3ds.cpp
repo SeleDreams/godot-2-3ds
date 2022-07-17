@@ -82,7 +82,8 @@ OS_3DS::OS_3DS()
 	//consoleInit(GFX_BOTTOM, NULL);
 	gfxSetDoubleBuffering(GFX_TOP, true);
 	aptHook(&apt_hook_cookie, apt_hook_callback, this);
-	osSetSpeedupEnable(false);
+	osSetSpeedupEnable(true);
+	APT_SetAppCpuTimeLimit(30); // Needed for QR Scanner to work.
 // 	set_low_processor_usage_mode(true);
 	_render_thread_mode=RENDER_THREAD_UNSAFE;
 	AudioDriverManagerSW::add_driver(&audio_driver);

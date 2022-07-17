@@ -776,6 +776,7 @@ class RasterizerCitro3d : public Rasterizer {
 	
 	RenderTarget* base_framebuffer;
 	RenderTarget* current_rt;
+	RenderTarget* bottom_current_rt;
 	bool current_rt_transparent;
 	bool current_rt_vflip;
 // 	ViewportData *current_vd;
