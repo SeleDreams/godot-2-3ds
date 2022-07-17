@@ -1993,7 +1993,7 @@ void RasterizerCitro3d::begin_frame()
 	scaled_time += time_delta;
 	last_time=time;
 	frame++;
-	C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+	C3D_FrameBegin(0);
 }
 
 void RasterizerCitro3d::capture_viewport(Image* r_capture) {
@@ -2006,7 +2006,6 @@ void RasterizerCitro3d::clear_viewport(const Color& p_color)
 {
 	print("clear_viewport\n");
 	RenderTarget* rt = current_rt ? current_rt : base_framebuffer;
-	RenderTarget* bottom_rt = bottom_current_rt ? bottom_current_rt : nullptr;
 	u32 c = (u8)(p_color.r*255);
 	c <<= 8;
 	c |= (u8)(p_color.g*255);
@@ -2015,8 +2014,6 @@ void RasterizerCitro3d::clear_viewport(const Color& p_color)
 	c <<= 8;
 	c |= (u8)(p_color.a*255);
 	C3D_RenderTargetClear(rt->target,C3D_CLEAR_ALL,c,0);
-	if (bottom_rt)
-		C3D_RenderTargetClear(bottom_rt->target,C3D_CLEAR_ALL,c,0);
 };
 
 void RasterizerCitro3d::set_viewport(const VS::ViewportRect& p_viewport)
