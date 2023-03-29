@@ -5,4 +5,4 @@ common_3ds=[\
 	"os_3ds.cpp",\
 ]
 
-env.Program('#bin/godot',['godot_3ds.cpp']+common_3ds)
+env.Program('#bin/godot.3ds.elf',['godot_3ds.cpp']+common_3ds)

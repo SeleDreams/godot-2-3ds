@@ -2,7 +2,6 @@
 import os
 import sys
 import platform
-import scons_compiledb
 
 
 def is_active():
@@ -14,33 +13,13 @@ def get_name():
 
 
 def can_build():
-    if (not "DEVKITPRO" in os.environ):
+    if (not os.getenv("DEVKITPRO")):
+        print("DEVKITPRO not found in environment! 3DS target disabled!")
         return False
-    if (not "DEVKITARM" in os.environ):
-        return False
-    if (not "CTRULIB" in os.environ):
-        return False
-    if (os.name == "nt"):
-        return False
-
-    envstr = 'PKG_CONFIG_PATH=${DEVKITPRO}/portlibs/3ds/lib/pkgconfig'
-    errorval = os.system("pkg-config --version > /dev/null")
-    if (errorval):
-        print("pkg-config not found... 3ds disabled.")
-        return False
-
-    for package in ['zlib', 'libpng']:
-        errorval = os.system(
-            "{} pkg-config {} --modversion > /dev/null".format(envstr, package))
-        if (errorval):
-            print(package+" not found... 3ds disabled.")
-            return False
-
     return True  # 3DS enabled
 
 
 def get_opts():
-
     return [
         ('debug_release', 'Add debug symbols to release version', 'no'),
     ]
@@ -57,7 +36,7 @@ def get_flags():
         ('module_dds_enabled', 'no'),
         ('module_pvr_enabled', 'no'),
         ('module_etc1_enabled', 'no'),
-        ('builtin_zlib', 'no'),
+        ('builtin_zlib', 'yes'),
         ('builtin_freetype','yes'),
         ("module_openssl_enabled", "no"),
         ('module_musepack_enabled', 'no')
@@ -81,7 +60,7 @@ def build_shader_header(target, source, env):
 
 
 def configure(env):
-    scons_compiledb.enable_with_cmdline(env)
+    env.use_windows_spawn_fix()
     env.disabled_modules = ['enet']
 
     env.Append(BUILDERS={'PICA': env.Builder(
@@ -91,8 +70,8 @@ def configure(env):
 
     env["bits"] = "32"
     devkitpro_path = os.environ["DEVKITPRO"]
-    devkitarm_path = os.environ["DEVKITARM"]
-    ctrulib_path = os.environ["CTRULIB"]
+    devkitarm_path = devkitpro_path + "/devkitARM"
+    ctrulib_path = devkitpro_path + "/libctru"
     env.Append(CPPPATH=['#platform/3ds'])
     env["CC"] = devkitarm_path + "/bin/arm-none-eabi-gcc"
     env["CXX"] = devkitarm_path + "/bin/arm-none-eabi-g++"
@@ -127,8 +106,3 @@ def configure(env):
     elif (env["target"] == "debug"):
         env.Append(CCFLAGS=['-O3','-g2','-Wall',
                    '-DDEBUG_ENABLED', '-DDEBUG_MEMORY_ENABLED'])
-
-    if (env['builtin_openssl'] == 'no'):
-       env.ParseConfig('PKG_CONFIG_PATH=${DEVKITPRO}/portlibs/3ds/lib/pkgconfig pkg-config openssl --cflags --libs')
-    if (env["builtin_freetype"] == "no"):
-        env.ParseConfig('PKG_CONFIG_PATH=${DEVKITPRO}/portlibs/3ds/lib/pkgconfig pkg-config freetype2 --cflags --libs')
